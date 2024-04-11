@@ -21,7 +21,7 @@ public class RedisServerClient : IRedisServerClient
         {
             logger.LogDebug(">> RedisServerClient: Building IServer from multiplexer...");
 
-            ConnectionMultiplexer connectionMultiplexer = await redisClient.GetClient().NoSync();
+            ConnectionMultiplexer connectionMultiplexer = await redisClient.Get().NoSync();
 
             EndPoint[] endpoints = connectionMultiplexer.GetEndPoints();
             IServer client = connectionMultiplexer.GetServer(endpoints[0]);
@@ -30,7 +30,7 @@ public class RedisServerClient : IRedisServerClient
         });
     }
 
-    public ValueTask<IServer> GetClient()
+    public ValueTask<IServer> Get()
     {
         return _client.Get();
     }

@@ -9,5 +9,5 @@ namespace Soenneker.Redis.Client.Server.Abstract;
 /// </summary>
 public interface IRedisServerClient : IDisposable, IAsyncDisposable
 {
-    ValueTask<IServer> GetClient();
+    ValueTask<IServer> Get();
 }
