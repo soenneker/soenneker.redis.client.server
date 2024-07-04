@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.ValueTask;
@@ -17,11 +18,11 @@ public class RedisServerClient : IRedisServerClient
 
     public RedisServerClient(ILogger<RedisServerClient> logger, IRedisClient redisClient)
     {
-        _client = new AsyncSingleton<IServer>(async () =>
+        _client = new AsyncSingleton<IServer>(async (token, _) =>
         {
             logger.LogDebug(">> RedisServerClient: Building IServer from multiplexer...");
 
-            ConnectionMultiplexer connectionMultiplexer = await redisClient.Get().NoSync();
+            ConnectionMultiplexer connectionMultiplexer = await redisClient.Get(token).NoSync();
 
             EndPoint[] endpoints = connectionMultiplexer.GetEndPoints();
             IServer client = connectionMultiplexer.GetServer(endpoints[0]);
@@ -30,9 +31,9 @@ public class RedisServerClient : IRedisServerClient
         });
     }
 
-    public ValueTask<IServer> Get()
+    public ValueTask<IServer> Get(CancellationToken cancellationToken = default)
     {
-        return _client.Get();
+        return _client.Get(cancellationToken);
     }
 
     public void Dispose()

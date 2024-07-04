@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Redis;
 
@@ -9,5 +10,5 @@ namespace Soenneker.Redis.Client.Server.Abstract;
 /// </summary>
 public interface IRedisServerClient : IDisposable, IAsyncDisposable
 {
-    ValueTask<IServer> Get();
+    ValueTask<IServer> Get(CancellationToken cancellationToken = default);
 }
