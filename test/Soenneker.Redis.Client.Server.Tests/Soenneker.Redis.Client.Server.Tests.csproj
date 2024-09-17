@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\src\Soenneker.Redis.Client.Server.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Redis.Client.Server.csproj" />
     </ItemGroup>
 
 </Project>
