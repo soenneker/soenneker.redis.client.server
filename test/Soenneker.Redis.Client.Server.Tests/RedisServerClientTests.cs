@@ -1,9 +1,10 @@
+using System.Threading.Tasks;
 using FluentAssertions;
 using Soenneker.Redis.Client.Server.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using StackExchange.Redis;
 using Xunit;
-using Xunit.Abstractions;
+
 
 namespace Soenneker.Redis.Client.Server.Tests;
 
@@ -15,7 +16,7 @@ public class RedisServerClientTests : FixturedUnitTest
     }
 
     [Fact]
-    public async void Get_should_return_client()
+    public async ValueTask Get_should_return_client()
     {
         var redisServerClient = Resolve<IRedisServerClient>();
 
