@@ -13,9 +13,19 @@ public static class RedisServerClientRegistrar
     /// <summary>
     /// Adds <see cref="IRedisServerClient"/> as a singleton service. <para/>
     /// </summary>
-    public static void AddRedisServerClientAsSingleton(this IServiceCollection services)
+    public static IServiceCollection AddRedisServerClientAsSingleton(this IServiceCollection services)
     {
         services.AddRedisClientAsSingleton();
         services.TryAddSingleton<IRedisServerClient, RedisServerClient>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRedisServerClientAsScoped(this IServiceCollection services)
+    {
+        services.AddRedisClientAsSingleton();
+        services.TryAddScoped<IRedisServerClient, RedisServerClient>();
+
+        return services;
     }
 }

@@ -25,9 +25,7 @@ public class RedisServerClient : IRedisServerClient
             ConnectionMultiplexer connectionMultiplexer = await redisClient.Get(token).NoSync();
 
             EndPoint[] endpoints = connectionMultiplexer.GetEndPoints();
-            IServer client = connectionMultiplexer.GetServer(endpoints[0]);
-
-            return client;
+            return connectionMultiplexer.GetServer(endpoints[0]);
         });
     }
 
