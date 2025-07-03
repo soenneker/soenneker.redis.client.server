@@ -12,7 +12,7 @@ using StackExchange.Redis;
 namespace Soenneker.Redis.Client.Server;
 
 /// <inheritdoc cref="IRedisServerClient"/>
-public class RedisServerClient : IRedisServerClient
+public sealed class RedisServerClient : IRedisServerClient
 {
     private readonly AsyncSingleton<IServer> _client;
 
@@ -36,15 +36,11 @@ public class RedisServerClient : IRedisServerClient
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
-
         _client.Dispose();
     }
 
     public ValueTask DisposeAsync()
     {
-        GC.SuppressFinalize(this);
-
         return _client.DisposeAsync();
     }
 }
