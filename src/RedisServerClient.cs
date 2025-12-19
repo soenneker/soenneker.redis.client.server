@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -18,7 +17,7 @@ public sealed class RedisServerClient : IRedisServerClient
 
     public RedisServerClient(ILogger<RedisServerClient> logger, IRedisClient redisClient)
     {
-        _client = new AsyncSingleton<IServer>(async (token, _) =>
+        _client = new AsyncSingleton<IServer>(async token =>
         {
             logger.LogDebug(">> RedisServerClient: Building IServer from multiplexer...");
 
