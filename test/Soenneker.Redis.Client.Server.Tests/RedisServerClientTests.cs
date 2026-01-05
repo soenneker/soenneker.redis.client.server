@@ -16,12 +16,18 @@ public class RedisServerClientTests : FixturedUnitTest
     }
 
     [Fact]
+    public void Default()
+    {
+    }
+
+    [Fact]
     public async ValueTask Get_should_return_client()
     {
         var redisServerClient = Resolve<IRedisServerClient>();
 
         IServer client = await redisServerClient.Get();
 
-        client.Should().NotBeNull();
+        client.Should()
+              .NotBeNull();
     }
 }
