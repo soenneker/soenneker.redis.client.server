@@ -1,26 +1,25 @@
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Redis.Client.Server.Abstract;
-using Soenneker.Tests.FixturedUnit;
+using Soenneker.Tests.HostedUnit;
 using StackExchange.Redis;
-using Xunit;
 
 
 namespace Soenneker.Redis.Client.Server.Tests;
 
-[Collection("Collection")]
-public class RedisServerClientTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class RedisServerClientTests : HostedUnitTest
 {
-    public RedisServerClientTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public RedisServerClientTests(Host host) : base(host)
     {
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
     }
 
-    [Fact]
+    [Test]
     public async ValueTask Get_should_return_client()
     {
         var redisServerClient = Resolve<IRedisServerClient>();
