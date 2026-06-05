@@ -10,5 +10,10 @@ namespace Soenneker.Redis.Client.Server.Abstract;
 /// </summary>
 public interface IRedisServerClient : IDisposable, IAsyncDisposable
 {
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the result of the operation.</returns>
     ValueTask<IServer> Get(CancellationToken cancellationToken = default);
 }
