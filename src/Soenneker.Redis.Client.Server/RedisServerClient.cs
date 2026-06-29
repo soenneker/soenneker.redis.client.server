@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using Soenneker.Dictionaries.Singletons;
 using Soenneker.Extensions.ValueTask;
 using Soenneker.Redis.Client.Abstract;
 using Soenneker.Redis.Client.Server.Abstract;
-using Soenneker.Utils.AsyncSingleton;
 using StackExchange.Redis;
 using System;
 using System.Net;
@@ -14,29 +14,31 @@ namespace Soenneker.Redis.Client.Server;
 /// <inheritdoc cref="IRedisServerClient"/>
 public sealed class RedisServerClient : IRedisServerClient
 {
+    private const string _defaultKey = "default:";
+
     private readonly ILogger<RedisServerClient> _logger;
     private readonly IRedisClient _redisClient;
 
-    private readonly AsyncSingleton<IServer> _client;
+    private readonly SingletonDictionary<IServer, string?> _clients;
 
     public RedisServerClient(ILogger<RedisServerClient> logger, IRedisClient redisClient)
     {
         _logger = logger;
         _redisClient = redisClient;
 
-        // No closure: method group
-        _client = new AsyncSingleton<IServer>(CreateServerAsync);
+        _clients = new SingletonDictionary<IServer, string?>(CreateServer);
     }
 
-    private async ValueTask<IServer> CreateServerAsync(CancellationToken token)
+    private async ValueTask<IServer> CreateServer(string _, string? connectionString, CancellationToken token)
     {
         _logger.LogDebug(">> RedisServerClient: Building IServer from multiplexer...");
 
-        ConnectionMultiplexer mux = await _redisClient.Get(token).NoSync();
+        ConnectionMultiplexer mux = connectionString is null
+            ? await _redisClient.Get(token).NoSync()
+            : await _redisClient.Get(connectionString, token).NoSync();
 
         EndPoint[] endpoints = mux.GetEndPoints();
 
-        // Defensive: GetEndPoints() should return at least one; if not, fail loudly.
         if (endpoints is null || endpoints.Length == 0)
             throw new InvalidOperationException("Redis ConnectionMultiplexer returned no endpoints.");
 
@@ -44,16 +46,19 @@ public sealed class RedisServerClient : IRedisServerClient
     }
 
     public ValueTask<IServer> Get(CancellationToken cancellationToken = default) =>
-        _client.Get(cancellationToken);
+        _clients.Get(_defaultKey, (string?)null, cancellationToken);
+
+    public ValueTask<IServer> Get(string connectionString, CancellationToken cancellationToken = default) =>
+        _clients.Get(connectionString, connectionString, cancellationToken);
 
     /// <summary>
     /// Releases resources used by the current instance.
     /// </summary>
-    public void Dispose() => _client.Dispose();
+    public void Dispose() => _clients.Dispose();
 
     /// <summary>
     /// Asynchronously releases resources used by the current instance.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public ValueTask DisposeAsync() => _client.DisposeAsync();
+    public ValueTask DisposeAsync() => _clients.DisposeAsync();
 }

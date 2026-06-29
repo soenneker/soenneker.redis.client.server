@@ -16,4 +16,12 @@ public interface IRedisServerClient : IDisposable, IAsyncDisposable
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task containing the result of the operation.</returns>
     ValueTask<IServer> Get(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <param name="connectionString">The connection string.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the result of the operation.</returns>
+    ValueTask<IServer> Get(string connectionString, CancellationToken cancellationToken = default);
 }
