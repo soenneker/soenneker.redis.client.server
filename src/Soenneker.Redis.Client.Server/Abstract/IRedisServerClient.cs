@@ -11,17 +11,17 @@ namespace Soenneker.Redis.Client.Server.Abstract;
 public interface IRedisServerClient : IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// Gets the value.
+    /// Returns the configured server used by the Redis Server Client.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the requested server.</returns>
     ValueTask<IServer> Get(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets the value.
+    /// Returns the configured server used by the Redis Server Client.
     /// </summary>
-    /// <param name="connectionString">The connection string.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="connectionString">Connection string used to open the backing service.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the requested server.</returns>
     ValueTask<IServer> Get(string connectionString, CancellationToken cancellationToken = default);
 }
