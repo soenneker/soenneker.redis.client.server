@@ -3,11 +3,40 @@
 [![](https://img.shields.io/nuget/dt/Soenneker.Redis.Client.Server.svg?style=for-the-badge)](https://www.nuget.org/packages/Soenneker.Redis.Client.Server/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.redis.client.server/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.redis.client.server/actions/workflows/codeql.yml)
 
-# ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Redis.Client.Server
-### A utility library for Redis server client accessibility
+# Soenneker.Redis.Client.Server
 
-## Installation
+A utility library for Redis server client accessibility.
 
-```
+## Install
+
+```bash
 dotnet add package Soenneker.Redis.Client.Server
 ```
+
+## Quick start
+
+```csharp
+using Soenneker.Redis.Client.Server.Registrars;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+var result = services.AddRedisServerClientAsSingleton();
+```
+
+Adds `IRedisServerClient` as a singleton service.
+
+## What you get
+
+- `IRedisServerClient` — A utility library for Redis server client accessibility.
+- `RedisServerClientRegistrar` — A utility library for Redis server client accessibility.
+
+## API at a glance
+
+| API | What it does | Result / important behavior |
+| --- | --- | --- |
+| `RedisServerClientRegistrar.AddRedisServerClientAsSingleton(services)` | Adds `IRedisServerClient` as a singleton service. | The same service collection, so additional registrations can be chained. |
+| `RedisServerClientRegistrar.AddRedisServerClientAsScoped(services)` | Registers Redis Server Client with a scoped lifetime. | The same service collection, so additional registrations can be chained. |
+
+## Practical notes
+
+- Dispose instances you own when their scope ends so held resources can be released.
