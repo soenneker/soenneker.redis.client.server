@@ -11,31 +11,30 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Redis.Client.Server;
 
-/// <inheritdoc cref="IRedisServerClient"/>
 public sealed class RedisServerClient : IRedisServerClient
 {
-    private const string _defaultKey = "default:";
+    private const string _defaultKey = "default";
 
     private readonly ILogger<RedisServerClient> _logger;
     private readonly IRedisClient _redisClient;
 
-    private readonly SingletonDictionary<IServer, string?> _clients;
+    private readonly SingletonDictionary<IServer, ServerKey> _clients;
 
     public RedisServerClient(ILogger<RedisServerClient> logger, IRedisClient redisClient)
     {
         _logger = logger;
         _redisClient = redisClient;
 
-        _clients = new SingletonDictionary<IServer, string?>(CreateServer);
+        _clients = new SingletonDictionary<IServer, ServerKey>(CreateServer);
     }
 
-    private async ValueTask<IServer> CreateServer(string _, string? connectionString, CancellationToken token)
+    private async ValueTask<IServer> CreateServer(string _, ServerKey key, CancellationToken token)
     {
         _logger.LogDebug(">> RedisServerClient: Building IServer from multiplexer...");
 
-        ConnectionMultiplexer mux = connectionString is null
+        ConnectionMultiplexer mux = !key.HasExplicitConnectionString
             ? await _redisClient.Get(token).NoSync()
-            : await _redisClient.Get(connectionString, token).NoSync();
+            : await _redisClient.Get(key.ConnectionString!, token).NoSync();
 
         EndPoint[] endpoints = mux.GetEndPoints();
 
@@ -46,10 +45,13 @@ public sealed class RedisServerClient : IRedisServerClient
     }
 
     public ValueTask<IServer> Get(CancellationToken cancellationToken = default) =>
-        _clients.Get(_defaultKey, (string?)null, cancellationToken);
+        _clients.Get(_defaultKey, ServerKey.Default, cancellationToken);
 
-    public ValueTask<IServer> Get(string connectionString, CancellationToken cancellationToken = default) =>
-        _clients.Get(connectionString, connectionString, cancellationToken);
+    public ValueTask<IServer> Get(string connectionString, CancellationToken cancellationToken = default)
+    {
+        var key = new ServerKey(true, connectionString);
+        return _clients.Get("connection:" + connectionString, key, cancellationToken);
+    }
 
     /// <summary>
     /// Releases resources used by the current instance.
@@ -61,4 +63,9 @@ public sealed class RedisServerClient : IRedisServerClient
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public ValueTask DisposeAsync() => _clients.DisposeAsync();
+
+    private readonly record struct ServerKey(bool HasExplicitConnectionString, string? ConnectionString)
+    {
+        public static readonly ServerKey Default = new(false, null);
+    }
 }

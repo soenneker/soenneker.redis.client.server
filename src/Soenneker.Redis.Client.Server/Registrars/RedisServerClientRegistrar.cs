@@ -6,12 +6,12 @@ using Soenneker.Redis.Client.Server.Abstract;
 namespace Soenneker.Redis.Client.Server.Registrars;
 
 /// <summary>
-/// A utility library for Redis server client accessibility
+/// Registers Redis server endpoint access.
 /// </summary>
 public static class RedisServerClientRegistrar
 {
     /// <summary>
-    /// Adds <see cref="IRedisServerClient"/> as a singleton service. <para/>
+    /// Adds <see cref="IRedisServerClient"/> and its backing Redis client as singleton services.
     /// </summary>
     /// <param name="services">Service collection that receives the registration.</param>
     /// <returns>The same service collection, so additional registrations can be chained.</returns>
@@ -24,7 +24,7 @@ public static class RedisServerClientRegistrar
     }
 
     /// <summary>
-    /// Registers Redis Server Client with a scoped lifetime.
+    /// Adds a scoped <see cref="IRedisServerClient"/> backed by a singleton Redis client.
     /// </summary>
     /// <param name="services">Service collection that receives the registration.</param>
     /// <returns>The same service collection, so additional registrations can be chained.</returns>

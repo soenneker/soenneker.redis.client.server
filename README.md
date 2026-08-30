@@ -1,42 +1,39 @@
 [![](https://img.shields.io/nuget/v/Soenneker.Redis.Client.Server.svg?style=for-the-badge)](https://www.nuget.org/packages/Soenneker.Redis.Client.Server/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.redis.client.server/publish-package.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.redis.client.server/actions/workflows/publish-package.yml)
 [![](https://img.shields.io/nuget/dt/Soenneker.Redis.Client.Server.svg?style=for-the-badge)](https://www.nuget.org/packages/Soenneker.Redis.Client.Server/)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.redis.client.server/build-and-test.yml?label=build%20and%20test&style=for-the-badge)](https://github.com/soenneker/soenneker.redis.client.server/actions/workflows/build-and-test.yml)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.redis.client.server/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.redis.client.server/actions/workflows/codeql.yml)
 
 # Soenneker.Redis.Client.Server
 
-A utility library for Redis server client accessibility.
+Provides cached StackExchange.Redis `IServer` instances backed by the shared `Soenneker.Redis.Client` multiplexer.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Soenneker.Redis.Client.Server
 ```
 
-## Quick start
+## Registration and use
+
+The default connection uses `Azure:Redis:ConnectionString`; see `Soenneker.Redis.Client` for the configuration shape.
 
 ```csharp
-using Soenneker.Redis.Client.Server.Registrars;
 using Microsoft.Extensions.DependencyInjection;
+using Soenneker.Redis.Client.Server.Abstract;
+using Soenneker.Redis.Client.Server.Registrars;
+using StackExchange.Redis;
 
-var services = new ServiceCollection();
-var result = services.AddRedisServerClientAsSingleton();
+services.AddRedisServerClientAsSingleton();
+
+IRedisServerClient serverClient = serviceProvider.GetRequiredService<IRedisServerClient>();
+IServer server = await serverClient.Get(cancellationToken);
+
+ServerCounters counters = await server.GetCountersAsync();
 ```
 
-Adds `IRedisServerClient` as a singleton service.
+Use `Get(connectionString, cancellationToken)` to maintain a separate cached server for another Redis connection. The selected server is the first endpoint reported by that connection's multiplexer.
 
-## What you get
+The scoped registration intentionally keeps `IRedisClient` singleton while making only the `IRedisServerClient` wrapper scoped. Disposing the scope releases the wrapper cache without destroying the shared multiplexer.
 
-- `IRedisServerClient` — A utility library for Redis server client accessibility.
-- `RedisServerClientRegistrar` — A utility library for Redis server client accessibility.
-
-## API at a glance
-
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `RedisServerClientRegistrar.AddRedisServerClientAsSingleton(services)` | Adds `IRedisServerClient` as a singleton service. | The same service collection, so additional registrations can be chained. |
-| `RedisServerClientRegistrar.AddRedisServerClientAsScoped(services)` | Registers Redis Server Client with a scoped lifetime. | The same service collection, so additional registrations can be chained. |
-
-## Practical notes
-
-- Dispose instances you own when their scope ends so held resources can be released.
+Commands classified by StackExchange.Redis as administrative require `allowAdmin=true` in the connection string. Only enable it for credentials and deployments where those commands are intended.
