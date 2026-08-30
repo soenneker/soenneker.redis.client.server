@@ -36,4 +36,4 @@ Use `Get(connectionString, cancellationToken)` to maintain a separate cached ser
 
 The scoped registration intentionally keeps `IRedisClient` singleton while making only the `IRedisServerClient` wrapper scoped. Disposing the scope releases the wrapper cache without destroying the shared multiplexer.
 
-Commands classified by StackExchange.Redis as administrative require `allowAdmin=true` in the connection string. Only enable it for credentials and deployments where those commands are intended.
+The backing Soenneker Redis client enables StackExchange.Redis administrative commands. Restrict the configured credentials and network access to the server operations the application is allowed to perform.
