@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Redis.Client.Server.Abstract;
@@ -20,11 +21,11 @@ public class RedisServerClientTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Get_should_return_client()
+    public async ValueTask Get_should_return_client(CancellationToken cancellationToken)
     {
         var redisServerClient = Resolve<IRedisServerClient>();
 
-        IServer client = await redisServerClient.Get();
+        IServer client = await redisServerClient.Get(cancellationToken: cancellationToken);
 
         client.Should()
               .NotBeNull();
