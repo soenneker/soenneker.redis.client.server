@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Redis.Client.Server;
 
+/// <inheritdoc cref="IRedisServerClient" />
 public sealed class RedisServerClient : IRedisServerClient
 {
     private const string _defaultKey = "default";
